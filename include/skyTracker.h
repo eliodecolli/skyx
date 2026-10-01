@@ -17,9 +17,6 @@
 
 namespace skyx
 {
-    inline constexpr std::string PEER_UDP_PUNCH_ATTR_NAME = "peer:udp:punch";
-    const std::string get_peer_udp_punch_value(std::string ip, int port);
-
     struct skyPacket_TrackerRegister {
         Peer_UUID                           uuid;
         std::vector<skyPeerAttribute>       attributes;

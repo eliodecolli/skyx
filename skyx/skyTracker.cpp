@@ -15,11 +15,6 @@
 
 namespace skyx
 {
-    const std::string get_peer_udp_punch_value(std::string ip, int port)
-    {
-        return std::format("{}:{}", ip, port);
-    }
-
     static skyPacketResponse handle_tracker_register(skyTracker *tracker, skyPacket_TrackerRegister req, const std::string& peer_ip, int peer_port) {
         skyPeerInfo peer;
         peer.peer_endpoint.t_port = peer_port;
@@ -80,6 +75,8 @@ namespace skyx
             // nope not found
             result.ok = false;
             result.message = std::format("Unknown peer with uuid {}", request.uuid);
+
+            std::printf("skyTracker:: Error while register UDP punch: Peer %s not found.\n", request.uuid.c_str());
         }
         else
         {
