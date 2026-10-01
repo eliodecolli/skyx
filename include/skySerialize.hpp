@@ -182,6 +182,13 @@ namespace skyx
     void serialize_peer_info(const skyPeerInfo &peer, netPacketBuffer &buf);
     skyPeerInfo deserialize_peer_info(BinaryReader &reader);
 
+    // tracker udp hole punching
+    void serialize_packet_tracker_udp_punch_register(const skyPacket_UdpPunchRegister &packet, netPacketBuffer &buf);
+    skyPacket_UdpPunchRegister deserialize_packet_tracker_udp_punch_register(const netPacketBuffer &buf);
+
+    void serialize_packet_tracker_udp_punch_register_result(const skyPacket_UdpPunchRegisterResult &packet, netPacketBuffer &buf);
+    skyPacket_UdpPunchRegisterResult deserialize_packet_tracker_udp_punch_result(const netPacketBuffer &buf);
+
     // peer query
     void serialize_packet_peer_query_request(const skyPacket_PeerQueryRequest &packet, netPacketBuffer &buf);
     skyPacket_PeerQueryRequest deserialize_packet_peer_query_request(const netPacketBuffer &buf);

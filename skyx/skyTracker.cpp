@@ -6,6 +6,7 @@
  */
 
 #include "common.h"
+#include <algorithm>
 #include <skyTracker.h>
 #include <skyPacket.h>
 #include <skySerialize.hpp>
@@ -14,6 +15,11 @@
 
 namespace skyx
 {
+    const std::string get_peer_udp_punch_value(std::string ip, int port)
+    {
+        return std::format("{}:{}", ip, port);
+    }
+
     static skyPacketResponse handle_tracker_register(skyTracker *tracker, skyPacket_TrackerRegister req, const std::string& peer_ip, int peer_port) {
         skyPeerInfo peer;
         peer.peer_endpoint.t_port = peer_port;
@@ -53,6 +59,45 @@ namespace skyx
         std::println("skyTracker:: Peer {} ({}) requested friend list: {} total peers.", req.uuid.c_str(), peer_ip.c_str(), result.peers.size());
 
         return response;
+    }
+
+    skyPacketResponse skyTracker::handle_udp_punch_request(const skyPacket &req)
+    {
+        // extract it
+        const auto request = deserialize_packet_tracker_udp_punch_register(req.buff);
+
+        // first make sure its a known peer
+        auto &peers = m_peers.get_all();
+        auto it = std::find_if(peers.begin(), peers.end(), [&request] (const skyPeerInfo &x)
+            {
+                return x.peer_uuid == request.uuid;
+            });
+
+        skyPacket_UdpPunchRegisterResult result;
+
+        if ( it == peers.end() )
+        {
+            // nope not found
+            result.ok = false;
+            result.message = std::format("Unknown peer with uuid {}", request.uuid);
+        }
+        else
+        {
+            std::printf(
+                "skyTracker:: Updating UDP punch data for peer %s -> %s:%d\n",
+                it->peer_uuid.c_str(),
+                req.ip.c_str(),
+                req.port
+            );
+            m_peers_udp_punches.insert_or_assign(it->peer_uuid, endpoint_t { req.ip, req.port });
+
+            result.ok = true;
+        }
+
+        skyPacketResponse resp;
+        serialize_packet_tracker_udp_punch_register_result(result, resp.message);
+
+        return resp;
     }
 
     void skyTracker::start() {

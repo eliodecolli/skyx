@@ -18,23 +18,23 @@ if (!expr) { \
 
 void run_test_job() {
     {
-        fs_file file;
+        skyx::fs_file file;
         file.open("test.txt", 3, 1024);
-        file.write(fs_cell { 3 }, fs_buf {'H', 'e', 'l'});
-        file.write(fs_cell { 6 }, fs_buf { 'l', 'o', '.'});
-        file.write(fs_cell { 12 }, fs_buf { 'T', 'e', 'e' });
+        file.write(skyx::fs_cell { 3 }, skyx::fs_buf {'H', 'e', 'l'});
+        file.write(skyx::fs_cell { 6 }, skyx::fs_buf { 'l', 'o', '.'});
+        file.write(skyx::fs_cell { 12 }, skyx::fs_buf { 'T', 'e', 'e' });
 
         // file.write(fs_cell { 15 }, fs_buf { 'h', 'e', 'e' });
 
-        ASSERT(std::filesystem::exists("test.txt"), "File was not created");
-        ASSERT(std::filesystem::exists("test.txt__head.fsh"), "Header was not created");
+        ASSERT((std::filesystem::exists("test.txt")), "File was not created");
+        ASSERT((std::filesystem::exists("test.txt__head.fsh")), "Header was not created");
     }
 
     //try to load it again
     {
-        fs_file f2;
+        skyx::fs_file f2;
         f2.open("test.txt");
-        fs_buf buf;
+        skyx::fs_buf buf;
         f2.slice(3, &buf);
 
         std::string h;

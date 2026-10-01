@@ -7,13 +7,19 @@
 
 #pragma once
 
-#include "netServer.h"
-#include "skyPeerTable.h"
-#include "common.h"
+#include <netServer.h>
+#include <skyPacket.h>
+#include <skyPeerTable.h>
+#include <common.h>
+#include <unordered_map>
 #include <vector>
+#include <netUdpSocket.h>
 
 namespace skyx
 {
+    inline constexpr std::string PEER_UDP_PUNCH_ATTR_NAME = "peer:udp:punch";
+    const std::string get_peer_udp_punch_value(std::string ip, int port);
+
     struct skyPacket_TrackerRegister {
         Peer_UUID                           uuid;
         std::vector<skyPeerAttribute>       attributes;
@@ -32,17 +38,29 @@ namespace skyx
         std::vector<skyPeerInfo> peers;
     };
 
+    struct skyPacket_UdpPunchRegister {
+        Peer_UUID   uuid;
+    };
+
+    struct skyPacket_UdpPunchRegisterResult {
+        bool ok;
+        std::string message;
+    };
+
     class skyTracker {
     private:
-        netServer server;
-        skyPeerTable m_peers;
+        netServer                                   server;
+        netUdpSocket                                m_udp;
+        skyPeerTable                                m_peers;
+        std::unordered_map<Peer_UUID, endpoint_t>   m_peers_udp_punches;
 
     private:
-        void listen(netServer *p_server, const netPacket& incoming);
+        void                    listen(netServer *p_server, const netPacket& incoming);
+        skyPacketResponse       handle_udp_punch_request(const skyPacket &req);
 
     public:
         void start();
-        skyTracker() : server{} {}
+        skyTracker() : server{}, m_udp{server.get_loop()} {}
 
         bool register_peer(const skyPeerInfo &peer);
         std::vector<skyPeerInfo> fetch_peers(const Peer_UUID& exclude);

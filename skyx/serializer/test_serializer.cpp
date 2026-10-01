@@ -127,11 +127,94 @@ void test_peer_query_dont_throw_on_missing_fragments()
     SKYX_ASSERT((d_resp.fragments.size() == 0), "test_peer_query_dont_throw_on_missing_fragments: Yeah, this is broken.");
 }
 
+void test_tracker_udp_punch_register_serialization()
+{
+    const std::string uuids[] = {
+        "9c3a37e2-2543-4b9e-8028-a03fbd0b1230",
+        "",
+        std::string("peer\0uuid", 9),
+        std::string(256, 'u')
+    };
+
+    for (const auto &uuid : uuids) {
+        const skyPacket_UdpPunchRegister req { uuid };
+        netPacketBuffer buf;
+        serialize_packet_tracker_udp_punch_register(req, buf);
+
+        SKYX_ASSERT((buf.size() == 4 + uuid.size()), "UDP punch register: Invalid serialized size!");
+        const auto decoded = deserialize_packet_tracker_udp_punch_register(buf);
+        SKYX_ASSERT((decoded.uuid == uuid), "UDP punch register: UUID did not round-trip!");
+    }
+
+    // A fixed fixture checks the wire format independently of the writer/reader pair.
+    netPacketBuffer expected { 0x00, 0x00, 0x01, 0x00 };
+    expected.insert(expected.end(), 256, 'u');
+    netPacketBuffer buf;
+    serialize_packet_tracker_udp_punch_register({ std::string(256, 'u') }, buf);
+    SKYX_ASSERT((buf == expected), "UDP punch register: Expected a big-endian uint32 length followed by UUID bytes!");
+    const auto decoded = deserialize_packet_tracker_udp_punch_register(expected);
+    SKYX_ASSERT((decoded.uuid == std::string(256, 'u')), "UDP punch register: Could not decode wire fixture!");
+}
+
+void test_tracker_udp_punch_register_result_serialization()
+{
+    const std::string messages[] = {
+        "",
+        "Peer not registered",
+        std::string("error\0detail", 12),
+        std::string(256, 'm')
+    };
+
+    for (bool ok : { false, true }) {
+        for (const auto &message : messages) {
+            const skyPacket_UdpPunchRegisterResult resp { ok, message };
+            netPacketBuffer buf;
+            serialize_packet_tracker_udp_punch_register_result(resp, buf);
+
+            // Empty messages omit both the length and the payload, regardless of status.
+            const auto expected_size = message.empty() ? 1 : 1 + 4 + message.size();
+            SKYX_ASSERT((buf.size() == expected_size), "UDP punch result: Invalid serialized size!");
+            SKYX_ASSERT((buf.front() == (ok ? 1 : 0)), "UDP punch result: Invalid status byte!");
+
+            const auto decoded = deserialize_packet_tracker_udp_punch_result(buf);
+            SKYX_ASSERT((decoded.ok == ok), "UDP punch result: Status did not round-trip!");
+            SKYX_ASSERT((decoded.message == message), "UDP punch result: Message did not round-trip!");
+        }
+
+        netPacketBuffer expected { static_cast<uint8_t>(ok), 0x00, 0x00, 0x01, 0x00 };
+        expected.insert(expected.end(), 256, 'm');
+        netPacketBuffer buf;
+        serialize_packet_tracker_udp_punch_register_result({ ok, std::string(256, 'm') }, buf);
+        SKYX_ASSERT((buf == expected), "UDP punch result: Expected status, big-endian uint32 length and message bytes!");
+        const auto decoded = deserialize_packet_tracker_udp_punch_result(expected);
+        SKYX_ASSERT((decoded.ok == ok), "UDP punch result: Could not decode wire fixture status!");
+        SKYX_ASSERT((decoded.message == std::string(256, 'm')), "UDP punch result: Could not decode wire fixture message!");
+    }
+}
+
+void test_tracker_udp_punch_result_empty_message_encodings()
+{
+    for (bool ok : { false, true }) {
+        const netPacketBuffer status_only { static_cast<uint8_t>(ok) };
+        const auto omitted = deserialize_packet_tracker_udp_punch_result(status_only);
+        SKYX_ASSERT((omitted.ok == ok), "UDP punch result: Invalid status with omitted message!");
+        SKYX_ASSERT((omitted.message.empty()), "UDP punch result: Omitted message should be empty!");
+
+        const netPacketBuffer zero_length { static_cast<uint8_t>(ok), 0x00, 0x00, 0x00, 0x00 };
+        const auto explicit_empty = deserialize_packet_tracker_udp_punch_result(zero_length);
+        SKYX_ASSERT((explicit_empty.ok == ok), "UDP punch result: Invalid status with zero-length message!");
+        SKYX_ASSERT((explicit_empty.message.empty()), "UDP punch result: Zero-length message should be empty!");
+    }
+}
+
 int main() {
     test_serialization();
     test_packet_tracker_register_serialization();
     test_peer_query_packets_serialize();
     test_peer_query_dont_throw_on_missing_fragments();
+    test_tracker_udp_punch_register_serialization();
+    test_tracker_udp_punch_register_result_serialization();
+    test_tracker_udp_punch_result_empty_message_encodings();
     printf("\033[32mTests passed successfully.\033[0m\n");
     return 0;
 }

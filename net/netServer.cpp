@@ -31,6 +31,11 @@ namespace skyx {
         });
     }
 
+    uv_loop_t *netServer::get_loop()
+    {
+        return m_loop;
+    }
+
     void netServer::quit_server() {
         if ( m_shutdown ) return;
 

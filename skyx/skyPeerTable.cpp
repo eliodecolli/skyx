@@ -9,6 +9,7 @@
 #include <skySerialize.hpp>
 #include <algorithm>
 #include <string_view>
+#include <vector>
 
 
 namespace skyx
@@ -24,6 +25,10 @@ namespace skyx
         }
 
         return false;
+    }
+
+    std::vector<skyPeerInfo>& skyPeerTable::get_all() {
+        return m_peers;
     }
 
     std::vector<skyPeerInfo> skyPeerTable::get_peers(const std::function<bool(Peer_UUID)>& predicate) {

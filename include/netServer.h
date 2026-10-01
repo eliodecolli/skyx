@@ -56,6 +56,7 @@ namespace skyx
         void listen(int port);
         void on_recieve(callback_fn callback);
         void send_data(const netPacket &data);
+        uv_loop_t *get_loop();
 
         netServer();
         virtual ~netServer();

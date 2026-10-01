@@ -18,6 +18,7 @@ namespace skyx
         TRACKER_DELIST,
         TRACKER_FETCH_PEERS,
         TRACKER_FETCH_PEERS_RESULT,
+        TRACKER_UDP_PUNCH_REGISTER,
 
         // peer
         PEER_QUERY,
@@ -31,6 +32,9 @@ namespace skyx
         SkyPacketType   type;
         uint32_t        len;
         netPacketBuffer buff;
+
+        std::string     ip;
+        int             port;
     };
 
 

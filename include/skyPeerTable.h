@@ -23,7 +23,7 @@ namespace skyx
 
     public:
         bool register_peer(const skyPeerInfo &p);
-
+        std::vector<skyPeerInfo>& get_all();
         std::vector<skyPeerInfo> get_peers(const std::function<bool(Peer_UUID)>& predicate);
     };
 }

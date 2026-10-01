@@ -6,6 +6,7 @@
  */
 
 #include "skyPeer.h"
+#include "skyTracker.h"
 #include <skySerialize.hpp>
 
 namespace skyx
@@ -56,6 +57,50 @@ namespace skyx
         return packet;
     }
 
+
+    void serialize_packet_tracker_udp_punch_register(const skyPacket_UdpPunchRegister &packet, netPacketBuffer &buf)
+    {
+        BinaryWriter writer { buf };
+        writer << static_cast<uint32_t>(packet.uuid.size());
+        writer << packet.uuid;
+    }
+
+    skyPacket_UdpPunchRegister deserialize_packet_tracker_udp_punch_register(const netPacketBuffer &buf)
+    {
+        BinaryReader reader { buf };
+        skyPacket_UdpPunchRegister result;
+        uint32_t len;
+        reader >> len;
+        reader.read_string(&result.uuid, len);
+        return result;
+    }
+
+    void serialize_packet_tracker_udp_punch_register_result(const skyPacket_UdpPunchRegisterResult &packet, netPacketBuffer &buf)
+    {
+        BinaryWriter writer { buf };
+        writer << packet.ok;
+        if ( packet.message.size() > 0 )
+        {
+            writer << static_cast<uint32_t>(packet.message.size());
+            writer << packet.message;
+        }
+    }
+
+    skyPacket_UdpPunchRegisterResult deserialize_packet_tracker_udp_punch_result(const netPacketBuffer &buf)
+    {
+        BinaryReader reader { buf };
+        skyPacket_UdpPunchRegisterResult result;
+
+        reader >> result.ok;
+        if ( !reader.eof() )
+        {
+            uint32_t len;
+            reader >> len;
+            reader.read_string(&result.message, len);
+        }
+
+        return result;
+    }
 
     void serialize_packet_tracker_register(const skyPacket_TrackerRegister &packet, netPacketBuffer &buf) {
         BinaryWriter writer(buf);
