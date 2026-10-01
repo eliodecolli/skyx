@@ -1,0 +1,117 @@
+# CMake and other generated build directories/files
+build/
+build-*/
+cmake-build-*/
+_build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+install_manifest.txt
+compile_commands.json
+build.ninja
+rules.ninja
+.ninja_deps
+.ninja_log
+/dist/
+target/
+
+# Compiled libraries, objects, executables, and debug symbols
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.pch
+*.gch
+*.dSYM/
+a.out
+
+# Standalone test outputs (do not ignore test source files or Makefiles)
+.test_db_build/
+.benchmark_db_build/
+test_docs/
+/net/test_server
+/net/test_client
+/net/test_udp_server
+/net/test_udp_client
+/skyx/fs/test_job
+/skyx/serializer/test_serializer
+/skyx/persistence/test_db
+/skyx/persistence/hash_*report*.txt
+
+# Runtime SQLite index and its journal/WAL files
+index.db
+index.db-journal
+index.db-wal
+index.db-shm
+
+# Coverage, profiling, and crash outputs
+*.gcda
+*.gcno
+*.gcov
+*.profraw
+*.profdata
+*.core
+core
+
+# Python bytecode, environments, and tool caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local editor configuration and caches
+.cache/
+.clangd/
+/.clangd
+.zed/
+.vscode/
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# Local environment files and private keys; keep shareable templates
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ecdsa
+id_ed25519
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# macOS / Windows metadata
+.DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+Thumbs.db
+Desktop.ini
