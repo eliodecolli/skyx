@@ -1,7 +1,7 @@
 /*
  * File Name: skyPacket.h
  * Author: Elio Decolli (eliodecolli@gmail.com)
- * Last Modified: 28/09/2026
+ * Last Modified: 01/10/2026
  * Purpose: Defines skyX protocol packet structures and types.
  */
 

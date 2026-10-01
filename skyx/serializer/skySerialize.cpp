@@ -1,7 +1,7 @@
 /*
  * File Name: skySerialize.cpp
  * Author: Elio Decolli (eliodecolli@gmail.com)
- * Last Modified: 28/09/2026
+ * Last Modified: 01/10/2026
  * Purpose: Implements binary serialization for skyX protocol messages.
  */
 
