@@ -25,6 +25,7 @@ namespace skyx
     class netClient
     {
         using callback_fn = cb<netClient, netPacket>;
+        using connect_callback_fn = std::function<void(netClient*, bool)>;
 
         struct client_context_t {
             netClient   *owner;
@@ -43,7 +44,8 @@ namespace skyx
             endpoint_t                          m_server_endpoint;
 
         private:
-            callback_fn                   m_rcv;
+            callback_fn                     m_rcv;
+            connect_callback_fn             m_connect_cb;
 
         private:
             static void connect_callback(uv_connect_t *req, int status);
@@ -56,7 +58,7 @@ namespace skyx
             void cleanup_client();
 
         public:
-            bool connect(const std::string &address_ip, int address_port);
+            bool connect(const std::string &address_ip, int address_port, const connect_callback_fn &connect_cb);
             void send(const netPacketBuffer &buf);
             void on_receive(callback_fn func);
 

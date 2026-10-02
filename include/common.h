@@ -11,6 +11,8 @@
 #include <vector>
 #include <functional>
 
+#define         SKYX_VERSION    "0.1a"
+
 typedef std::string     Peer_UUID;
 
 template<typename TOwner, typename TPacket>

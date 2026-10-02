@@ -163,7 +163,7 @@ namespace skyx
     skyPacket make_packet(SkyPacketType type, const netPacketBuffer &buf);
 
     netPacketBuffer serialize_packet(const skyPacket &packet, netPacketBuffer &buf);
-    const skyPacket deserialize_packet(const netPacketBuffer &data);
+    const skyPacket deserialize_packet(const netPacket &net_packet);
 
     // tracker register
     void serialize_packet_tracker_register(const skyPacket_TrackerRegister &packet, netPacketBuffer &buf);

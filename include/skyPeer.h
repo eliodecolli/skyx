@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <common.h>
+#include <job.h>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -28,5 +30,38 @@ namespace skyx
         bool                                    owns_file;
 
         std::vector<fragment_description_t>     fragments;
+    };
+
+    struct index_tree_info_t {
+        std::string         file_path;
+        std::string         file_hash;
+        std::string         path_key;
+        uint64_t            size;
+    };
+
+    struct peer_index_tree_t {
+        std::vector<index_tree_info_t>      index;
+    };
+
+    struct skyPacket_PeerIndexQueryRequest {
+        Peer_UUID       request_owner;
+    };
+
+    struct skyPacket_PeerIndexQueryResponse {
+        Peer_UUID               index_owner;
+        peer_index_tree_t       index;
+    };
+
+    // job logic
+    struct ActiveJob {
+        std::vector<Peer_UUID>      peers;
+        std::string                 file_name;
+        std::string                 path_key;
+        fs_file                     job_src;
+        bool                        completed;
+        uint64_t                    started_at;
+
+        public:
+            std::string             get_file_name_only();
     };
 }

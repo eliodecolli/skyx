@@ -5,6 +5,7 @@
  * Purpose: Implements binary serialization for skyX protocol messages.
  */
 
+#include "netPacket.h"
 #include "skyPeer.h"
 #include "skyTracker.h"
 #include <skySerialize.hpp>
@@ -41,9 +42,12 @@ namespace skyx
         return writer.get_buffer();
     }
 
-    const skyPacket deserialize_packet(const netPacketBuffer &data) {
+    const skyPacket deserialize_packet(const netPacket &net_packet) {
         skyPacket packet;
-        BinaryReader reader(data);
+        BinaryReader reader(net_packet.buffer);
+
+        packet.ip = net_packet.address;
+        packet.port = net_packet.port;
 
         // first read the first byte -> packet type
         reader >> packet.type;

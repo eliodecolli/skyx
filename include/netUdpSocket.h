@@ -1,3 +1,5 @@
+#pragma once
+
 #include <netPacket.h>
 #include <common.h>
 #include <uv.h>

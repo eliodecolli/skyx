@@ -2,20 +2,23 @@
  * File Name: skyClient.h
  * Author: Elio Decolli (eliodecolli@gmail.com)
  * Last Modified: 20/09/2026
- * Purpose: Declares the skyX peer client interface.
+ * Purpose: Declares the SkyX peer client interface.
  */
 
 #pragma once
 
-#include "skyPeer.h"
-#include "skyTracker.h"
+#include "common.h"
+#include "uv.h"
+#include <skyPeer.h>
+#include <netClient.h>
+#include <netUdpSocket.h>
 #include <skyPacket.h>
-#include <common.h>
-#include <unordered_map>
 
 
 namespace skyx
 {
+    inline const std::string VERSION_ATTR = "skyx-ver";
+
     class skyClient {
 
         struct connectedPeer_t {
@@ -24,17 +27,31 @@ namespace skyx
             int             port;
         };
 
-    private:
-        std::unordered_map<netClientName, connectedPeer_t>      m_peers;
+        struct connectedTracker_t {
+            netClient   m_tcp_socket;
+            endpoint_t  m_endpoint;
+        };
 
-    private:
-        void on_tracker_register_result(const skyPacket_TrackerRegisterResult packet);
+        private:
+            std::unordered_map<netClientName, connectedPeer_t>      m_peers;
+            std::unordered_map<std::string, ActiveJob>              m_jobs;
+            std::vector<connectedTracker_t>                         m_trackers;
 
-        void on_peer_query_request(const skyPacket_PeerQueryRequest request);
-        void on_peer_query_response(const skyPacket_PeerQueryResponse response);
+        private:
+            Peer_UUID                                               m_uuid;
+            uv_loop_t                                               *m_loop;
+            netUdpSocket                                            m_udp_socket;
 
-    public:
-        void register_presence(const endpoint_t &addr);
-        void broadcast_message(const skyPacket &packet);
+        private:
+            void on_tracker_response(const skyPacket packet);
+            void on_peer_message(const skyPacket &packet);
+
+        public:
+            void register_presence(const endpoint_t &addr);
+            void broadcast_message(const skyPacket &packet);
+
+        public:
+            skyClient(uv_loop_t *owner_loop, const Peer_UUID &uuid);
+            ~skyClient() = default;
     };
 }

@@ -22,6 +22,12 @@ namespace skyx
                 context
                     ->owner
                         ->m_connected = value;
+
+                auto &cb = context->owner->m_connect_cb;
+                if ( cb != nullptr )
+                {
+                    cb(context->owner, value);
+                }
             };
 
         if ( status < 0 )
@@ -42,7 +48,7 @@ namespace skyx
         free(req);
     }
 
-    bool netClient::connect(const std::string &ip, int port)
+    bool netClient::connect(const std::string &ip, int port, const connect_callback_fn &connect_cb)
     {
         uv_tcp_init(m_loop, &m_client_handle);
 
@@ -55,6 +61,8 @@ namespace skyx
         uv_connect_t *m_connect_handle =
             (uv_connect_t *) malloc(sizeof(uv_connect_t));
         m_connect_handle->data = client_context;
+
+        m_connect_cb = connect_cb;
 
         uv_tcp_connect(
             m_connect_handle,
