@@ -1,7 +1,7 @@
-#include "common.h"
-#include "netUdpSocket.h"
-#include "skyPacket.h"
-#include "skyTracker.h"
+#include <common.h>
+#include <netUdpSocket.h>
+#include <skyPacket.h>
+#include <skyTracker.h>
 #include <skyClient.h>
 #include <format>
 #include <algorithm>
@@ -26,10 +26,6 @@ namespace skyx
     skyClient::skyClient(uv_loop_t *owner_loop, const Peer_UUID &uuid)
                 : m_uuid(uuid), m_udp_socket(owner_loop)
     {
-        // I can consolidate these two into a single 'on_sky_packet()' but then I'd have to split them according to some
-        // ugly ass switch rules based on their packet type
-        // Instead this way we have a clear separation at the expense of DRY :)
-        //
         m_loop = owner_loop;
         bootstrap_socket(&m_udp_socket, [&] (const skyPacket &packet)
             {
